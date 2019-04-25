@@ -7,8 +7,6 @@
                 var gridField = this.getGridField();
                 var state = gridField.getState().GridFieldListedPagesAddNewButton;
 
-                console.log(this.val());
-
                 state.pageType = this.val();
                 gridField.setState("GridFieldListedPagesAddNewButton", state);
             }
