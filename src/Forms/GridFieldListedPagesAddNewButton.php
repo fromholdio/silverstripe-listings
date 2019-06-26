@@ -107,8 +107,8 @@ class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements 
         $forTemplate->Fields->push($pageTypes);
         $forTemplate->Fields->push($addAction);
 
-        Requirements::css('resources/fromholdio-listings/client/dist/css/listings.css');
-        Requirements::javascript('resources/fromholdio-listings/client/dist/js/GridField.js');
+        Requirements::css('fromholdio/silverstripe-listings: client/dist/css/listings.css');
+        Requirements::javascript('fromholdio/silverstripe-listings: client/dist/js/GridField.js');
 
         return [$this->targetFragment => $forTemplate->renderWith(__CLASS__)];
     }
