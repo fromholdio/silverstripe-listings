@@ -10,6 +10,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Listings\Forms\GridFieldConfig_ListedPages;
+use Symbiote\GridFieldExtensions\GridFieldConfigurablePaginator;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 class ListingsRootPageExtension extends ListingsSiteTreeExtension
@@ -123,6 +124,9 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
                     $listedPagesFieldConfig
                         ->addComponent(new GridFieldOrderableRows($orderableSort));
                 }
+
+                $listedPagesFieldConfig
+                    ->addComponent(new GridFieldConfigurablePaginator());
             }
 
             // Add field to new Tab, named using $pluralName with spaces removed
