@@ -8,6 +8,8 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldPageCount;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Listings\Forms\GridFieldConfig_ListedPages;
 use Symbiote\GridFieldExtensions\GridFieldConfigurablePaginator;
@@ -126,6 +128,10 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
                 }
 
                 $listedPagesFieldConfig
+                    ->removeComponentsByType([
+                        GridFieldPageCount::class,
+                        GridFieldPaginator::class
+                    ])
                     ->addComponent(new GridFieldConfigurablePaginator());
             }
 
