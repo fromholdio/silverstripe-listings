@@ -6,6 +6,7 @@ use Fromholdio\CommonAncestor\CommonAncestor;
 use Fromholdio\Listings\Extensions\ListedPageExtension;
 use Psr\SimpleCache\CacheInterface;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Middleware\FlushMiddleware;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Flushable;
@@ -23,11 +24,15 @@ class ListedPages implements Flushable
     public static function get_classes($includeSubclasses = true)
     {
         $classes = [];
-		$cache = self::get_cache();
         
         // retrieve classes from cache
-        if ($cache->has(self::get_cache_key('Classes'))) {
-            $classes = $cache->get(self::get_cache_key('Classes'));
+        $cache = self::get_cache();
+		$cacheKey = self::get_cache_key('Classes');
+		if (!$cache->has($cacheKey)) {
+		    self::build_cache();
+		}
+		if ($cache->has($cacheKey)) {
+		    $classes = $cache->get($cacheKey);
         }
         
         if ($includeSubclasses) {
@@ -136,9 +141,8 @@ class ListedPages implements Flushable
 
     protected static function add_subclasses($classes)
     {
-        $cache = self::get_cache();
-        
         // retrieve classes from cache
+        $cache = self::get_cache();
         $cacheKey = self::get_cache_key('IncludeSubclasses', $classes);
         if ($cache->has($cacheKey)) {
             
@@ -230,7 +234,10 @@ class ListedPages implements Flushable
     public static function flush()
     {
         self::get_cache()->clear();
-        
+        self::build_cache();
+    }
+    
+    private static function build_cache() {
         // build pages cache
         $pages = [];
         $classes = ClassInfo::subclassesFor(SiteTree::class);
@@ -244,7 +251,6 @@ class ListedPages implements Flushable
         $cacheKey = self::get_cache_key('Classes');
         $cache->set($cacheKey, $pages);
         self::add_subclasses($pages);
-        
     }
     
     private static function get_cache() {
