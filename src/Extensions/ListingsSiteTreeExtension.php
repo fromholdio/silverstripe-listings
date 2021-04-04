@@ -73,4 +73,16 @@ class ListingsSiteTreeExtension extends SiteTreeExtension
 
         return $class;
     }
+
+    public function getListedPagesCommonSingularName()
+    {
+        $class = $this->getOwner()->getListedPagesCommonClass();
+        return $class::singleton()->i18n_singular_name();
+    }
+
+    public function getListedPagesCommonPluralName()
+    {
+        $class = $this->getOwner()->getListedPagesCommonClass();
+        return $class::singleton()->i18n_plural_name();
+    }
 }
