@@ -1,3 +1,9 @@
 ---
 Name: fromholdio-listings
 ---
+
+SilverStripe\Core\Injector\Injector:
+  Psr\SimpleCache\CacheInterface.ListingsCache:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: "ListingsCache"

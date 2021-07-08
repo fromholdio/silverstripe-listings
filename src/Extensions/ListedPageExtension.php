@@ -13,11 +13,6 @@ use SilverStripe\View\SSViewer;
 
 class ListedPageExtension extends SiteTreeExtension
 {
-    public static function add_to_class($class, $extensionClass, $args = null)
-    {
-        ListedPages::register_class($class);
-    }
-
     public function updateCMSFields(FieldList $fields)
     {
         // Remove ParentID dropdown (if mode != cmstree)

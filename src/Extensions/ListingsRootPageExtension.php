@@ -77,11 +77,6 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
      */
     private static $administration_mode = 'cmstree';
 
-    public static function add_to_class($class, $extensionClass, $args = null)
-    {
-        ListingsRoots::register_class($class);
-    }
-
     public function getListedPagesParentIDs()
     {
         return [$this->owner->ID];
