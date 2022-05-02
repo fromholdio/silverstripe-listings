@@ -1,3 +1,8 @@
 ---
 Name: fromholdio-listings
+After:
+  - gridfieldextensions
 ---
+
+Fromholdio\Listings\Forms\GridFieldListedPagesAddNewButton:
+  showEmptyString: true
