@@ -31,3 +31,11 @@ More thorough docs to come. In the meantime please submit questions as issues.
 ## To Do
 
 * Documentation and usage examples
+
+## When using ListedPagesAdmin (ModelAdmin subclass) to manage pages
+
+Add `doPlaceCMSFieldsUnderListedPagesAdminRootTabSet():bool` to your ListedPage class, and when displayed inside a ListedPagesAdmin the page fields' TabSets and Tabs will be displayed on the left side (like regularly viewed pages) rather than the top right.
+
+Further add `doAddSettingsFieldsAsListedPagesAdminTab():bool` to ListedPage class, and the page's settings fields will be displayed per regularly viewed pages as a Settings tab on the top right. This may/may not work for your specific class, where the same field name exists in your pages' getCMSFields and getSettingsFields. You'll need to manage that.
+
+
