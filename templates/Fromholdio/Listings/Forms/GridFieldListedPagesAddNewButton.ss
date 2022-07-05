@@ -1,3 +1,3 @@
-<% loop $Fields %>
+<% loop Fields %>
 	$FieldHolder
 <% end_loop %>

@@ -2,11 +2,10 @@
 
 namespace Fromholdio\Listings\Forms;
 
-use Fromholdio\Helpers\GridFields\Forms\GridFieldExtraDataDetailForm;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 
-class ListedPageGridFieldDetailForm extends GridFieldExtraDataDetailForm implements GridField_URLHandler
+class ListedPageGridFieldDetailForm extends GridFieldDetailForm implements GridField_URLHandler
 {
     protected $defaultParentID;
 
