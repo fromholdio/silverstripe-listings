@@ -6,6 +6,13 @@ use SilverStripe\Control\Controller;
 
 class ListedPageGridFieldAddNewMultiClassHandler extends ListedPageGridFieldItemRequest
 {
+    public function __construct($gridField, $component, $record, $requestHandler, $popupFormName)
+    {
+        parent::__construct($gridField, $component, $record, $requestHandler, $popupFormName);
+        $record = $component->handleNewRecord($record);
+        $this->record = $record;
+    }
+
     public function Link($action = null)
     {
         if ($this->record->ID) {
