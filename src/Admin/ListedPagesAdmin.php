@@ -366,8 +366,9 @@ abstract class ListedPagesAdmin extends ModelAdmin
         if (!empty($multiClasses))
         {
             $classesFilter = [];
-            foreach ($multiClasses as $class)
+            foreach ($multiClasses as $key => $value)
             {
+                $class = is_int($key) ? $value : $key;
                 $subclasses = array_values(ClassInfo::subclassesFor($class));
                 $classesFilter = [...$classesFilter, ...$subclasses];
             }
