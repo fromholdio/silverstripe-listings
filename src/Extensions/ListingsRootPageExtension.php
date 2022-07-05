@@ -2,12 +2,17 @@
 
 namespace Fromholdio\Listings\Extensions;
 
+use Fromholdio\Listings\Forms\GridFieldListedPagesAddNewButton;
+use Fromholdio\Listings\Forms\GridFieldListedPagesEditButton;
 use Fromholdio\Listings\ListingsRoots;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_ActionMenu;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
 use SilverStripe\Forms\GridField\GridFieldPageCount;
 use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\HeaderField;
@@ -107,32 +112,36 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
 
             // Else build the GridField
             else {
+                $classes = $this->getOwner()->getListedPagesClasses();
+                $showAdd = count($classes) === 1;
+
+                $orderableSort = $this->getOwner()->getListedPagesOrderableSort();
+                $sort = empty($orderableSort) ? null : $orderableSort;
+
                 $listedPagesField = GridField::create(
                     'ListedPages',
                     $pluralName,
                     $this->getListedPages(),
-                    $listedPagesFieldConfig = GridFieldConfig_ListedPages::create()
+                    $listedPagesFieldConfig = GridFieldConfig_ListedPages::create(
+                        $sort, 20, true, $showAdd, ['ParentID' => $this->ID], true
+                    )
                 );
+
+                $listedPagesFieldConfig
+                    ->removeComponentsByType([
+                        GridFieldAddNewButton::class,
+                        GridFieldEditButton::class,
+                        GridField_ActionMenu::class
+                    ])
+                    ->addComponent(new GridFieldListedPagesAddNewButton())
+                    ->addComponent(new GridFieldListedPagesEditButton())
+                    ->addComponent(new GridField_ActionMenu());
 
                 // In the absence of a real has_many/many_many relation defined,
                 // ensure GridField has a model class name to get summary_fields from.
                 $listedPagesField->setModelClass(
                     $this->owner->getListedPagesCommonClass()
                 );
-
-                // If orderable sort field name is supplied, apply GridFieldOrderableRows.
-                $orderableSort = $this->owner->getListedPagesOrderableSort();
-                if ($orderableSort) {
-                    $listedPagesFieldConfig
-                        ->addComponent(new GridFieldOrderableRows($orderableSort));
-                }
-
-                $listedPagesFieldConfig
-                    ->removeComponentsByType([
-                        GridFieldPageCount::class,
-                        GridFieldPaginator::class
-                    ])
-                    ->addComponent(new GridFieldConfigurablePaginator());
             }
 
             // Add field to new Tab, named using $pluralName with spaces removed

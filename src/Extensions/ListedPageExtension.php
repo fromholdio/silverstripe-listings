@@ -106,7 +106,8 @@ class ListedPageExtension extends SiteTreeExtension
 
     public function getAvailableListingsRoots()
     {
-        return ListingsRoots::get($this->getOwner()->getAvailableListingsRootsClasses());
+        $classes = $this->getOwner()->getAvailableListingsRootsClasses();
+        return empty($classes) ? null : ListingsRoots::get($classes);
     }
 
     public function getAvailableListingsRootsClasses()
