@@ -4,5 +4,11 @@ After:
   - gridfieldextensions
 ---
 
+SilverStripe\Core\Injector\Injector:
+  Psr\SimpleCache\CacheInterface.ListingsCache:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: "ListingsCache"
+
 Fromholdio\Listings\Forms\GridFieldListedPagesAddNewButton:
   showEmptyString: true
