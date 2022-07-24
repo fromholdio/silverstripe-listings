@@ -31,6 +31,8 @@ use SilverStripe\View\Requirements;
  */
 class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements GridField_ActionProvider
 {
+    private static $showEmptyString = false;
+
     /**
      * Determine the list of classnames and titles allowed for a given parent object
      *
@@ -71,6 +73,10 @@ class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements 
             $pageTypes
                 ->setFieldHolderTemplate(__CLASS__ . '_holder')
                 ->addExtraClass('gridfield-dropdown gridfield-listedpages no-change-track');
+
+            if (Config::inst()->get(__CLASS__, 'showEmptyString')) {
+                $pageTypes->setEmptyString(_t(__CLASS__ . '.SELECTTYPETOCREATE', '(Select type to create)'));
+            }
 
             $state->pageType = $parent->defaultChild();
 
