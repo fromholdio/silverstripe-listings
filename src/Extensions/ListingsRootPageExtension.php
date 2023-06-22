@@ -326,7 +326,7 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
         return $classes;
     }
 
-    public function augmentAllChildrenIncludingDeleted(&$stageChildren, &$context)
+    public function augmentAllChildrenIncludingDeleted(&$stageChildren)
     {
         if ($this->shouldFilter()) {
             $stageChildren = $stageChildren->exclude('ClassName', $this->getExcludedSiteTreeClassNames());
