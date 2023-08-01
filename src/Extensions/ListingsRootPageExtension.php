@@ -21,8 +21,6 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
     const ADMIN_MODE_GRIDFIELD = 'gridfield';
     const ADMIN_MODE_ADMIN = 'admin';
 
-    protected $excludedSiteTreeClassNames;
-
     /*
      * Flag to set whether this Listed Pages Root can have only children
      * that are in its $listed_pages_classes array.
@@ -306,8 +304,8 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
 
     public function getExcludedSiteTreeClassNames()
     {
-        if (is_null($this->owner->excludedSiteTreeClassNames)) {
-            $this->owner->excludedSiteTreeClassNames = [];
+        if ($this->owner->hasDynamicData('excludedSiteTreeClassNames')) {
+            return $this->owner->getDynamicData('excludedSiteTreeClassNames');
         }
 
         $classes = [];
@@ -323,10 +321,12 @@ class ListingsRootPageExtension extends ListingsSiteTreeExtension
             }
         }
 
+        $this->owner->setDynamicData('excludedSiteTreeClassNames', $classes);
+
         return $classes;
     }
 
-    public function augmentAllChildrenIncludingDeleted(&$stageChildren, &$context)
+    public function augmentAllChildrenIncludingDeleted(&$stageChildren)
     {
         if ($this->shouldFilter()) {
             $stageChildren = $stageChildren->exclude('ClassName', $this->getExcludedSiteTreeClassNames());

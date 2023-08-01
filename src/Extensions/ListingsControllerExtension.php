@@ -9,8 +9,6 @@ use SilverStripe\ORM\DataList;
 
 class ListingsControllerExtension extends Extension
 {
-    protected $listedPages;
-
     /**
      * Only applicable if no associated Page extended with ListingsPageExtension.
      */
@@ -24,8 +22,8 @@ class ListingsControllerExtension extends Extension
 
     public function getListedPages()
     {
-        if ($this->owner->listedPages) {
-            return $this->owner->listedPages;
+        if ($this->owner->hasDynamicData('listedPages')) {
+            return $this->owner->getDynamicData('listedPages');
         }
 
         $listingsPage = $this->owner->getListingsPage();
@@ -57,7 +55,7 @@ class ListingsControllerExtension extends Extension
             );
         }
 
-        $this->owner->listedPages = $pages;
+        $this->owner->setDynamicData('listedPages', $pages);
         return $this;
     }
 

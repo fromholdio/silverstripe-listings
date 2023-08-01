@@ -7,10 +7,6 @@ use SilverStripe\CMS\Model\SiteTreeExtension;
 
 class ListingsSiteTreeExtension extends SiteTreeExtension
 {
-    protected $listedPagesCommonClass;
-    protected $listedPagesCommonSingularName;
-    protected $listedPagesCommonPluralName;
-
     /**
      * You must supply an array of at least one SiteTree class extended
      * by ListedPageExtension, identifying which Listed Pages are to be
@@ -64,12 +60,12 @@ class ListingsSiteTreeExtension extends SiteTreeExtension
 
     public function getListedPagesCommonClass()
     {
-        if ($this->owner->listedPagesCommonClass) {
-            return $this->owner->listedPagesCommonClass;
+        if ($this->owner->hasDynamicData('listedPagesCommonClass')) {
+            return $this->owner->getDynamicData('listedPagesCommonClass');
         }
 
         $class = ListedPages::get_common_class($this->getListedPagesClasses());
-        $this->owner->listedPagesCommonClass = $class;
+        $this->owner->setDynamicData('listedPagesCommonClass', $class);
 
         return $class;
     }
