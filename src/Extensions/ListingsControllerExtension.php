@@ -15,11 +15,6 @@ class ListingsControllerExtension extends Extension
     private static $listed_pages_classes = [];
     private static $listed_pages_index_only = false;
 
-    public function onBeforeInit()
-    {
-        $this->owner->getListedPages();
-    }
-
     public function getListedPages()
     {
         if ($this->owner->hasDynamicData('listedPages')) {
