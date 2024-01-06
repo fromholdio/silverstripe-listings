@@ -3,13 +3,14 @@
 namespace Fromholdio\Listings\Admin;
 
 use Fromholdio\CommonAncestor\CommonAncestor;
-use Fromholdio\Listings\Extensions\ListingsRootPageExtension;
+use Fromholdio\Listings\Extensions\ListingsRootExtension;
 use Fromholdio\Listings\Extensions\ListedPageExtension;
 use Fromholdio\Listings\Forms\ListedPageGridFieldAddNewMultiClassHandler;
 use Fromholdio\Listings\Forms\ListedPageGridFieldItemRequest;
 use Fromholdio\Listings\ListedPages;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\GridField\GridField;
@@ -17,6 +18,7 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\Listings\Forms\GridFieldConfig_ListedPages;
 use SilverStripe\Listings\Forms\GridFieldConfig_ListedPagesAdmin;
 use SilverStripe\View\Requirements;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
@@ -40,7 +42,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
 
     public function getManagedModels()
     {
-        $models = $this->config()->get('managed_models');
+        $models = static::config()->get('managed_models');
         if (is_string($models)) {
             $models = array($models);
         }
@@ -113,9 +115,9 @@ abstract class ListedPagesAdmin extends ModelAdmin
 
         $model = singleton($this->modelClass);
 
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
 
-            if ($model->getAdministrationMode() !== ListingsRootPageExtension::ADMIN_MODE_ADMIN) {
+            if ($model->getAdministrationMode() !== ListingsRootExtension::ADMIN_MODE_ADMIN) {
                 throw new \UnexpectedValueException(
                     'You have setup a ListedPagesAdmin with a ListedPagesRoot that is not set to "admin" mode.'
                     . ' Supplied ListedPagesRoot class is ' . $this->modelClass
@@ -128,7 +130,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
                 $fields
             );
         }
-        else if (is_a($model, SiteTree::class)) {
+        if (is_a($model, SiteTree::class)) {
             return $this->getEditFormForSiteTrees($id, $fields);
         }
 
@@ -139,10 +141,10 @@ abstract class ListedPagesAdmin extends ModelAdmin
     {
         $model = singleton($this->modelClass);
 
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
-            return $this->getListForListingsRootPage();
-        }
-        else if (is_a($model, SiteTree::class)) {
+//        if ($model->hasExtension(ListingsRootExtension::class)) {
+//            return $this->getListForListingsRootPage();
+//        }
+        if (is_a($model, SiteTree::class)) {
             return $this->getListForSiteTrees();
         }
 
@@ -276,15 +278,14 @@ abstract class ListedPagesAdmin extends ModelAdmin
         );
 
         $orderableSort = $root->getListedPagesOrderableSort();
-
-        if ($orderableSort) {
+        if (!empty($orderableSort)) {
             $gridConfig
                 ->addComponent(new GridFieldOrderableRows($orderableSort));
         }
 
         // If add-new-multi classes are supplied, apply GFAddNewMultiClass.
         $addNewMultiClasses = $root->getListedPagesAddNewMultiClasses();
-        if ($addNewMultiClasses) {
+        if (!empty($addNewMultiClasses)) {
             $gridConfig
                 ->removeComponentsByType(GridFieldAddNewButton::class)
                 ->addComponent($multiAdder = new GridFieldAddNewMultiClass());
@@ -309,20 +310,24 @@ abstract class ListedPagesAdmin extends ModelAdmin
     {
         $form = parent::getEditForm($id, $fields);
 
-        if (singleton($this->modelClass)->hasExtension(ListedPageExtension::class)) {
-
+        if (singleton($this->modelClass)->hasExtension(ListedPageExtension::class))
+        {
+            /** @var GridField $gridField */
             $gridField = $form->Fields()->fieldByName(
                 $this->sanitiseClassName($this->modelClass)
             );
 
-            $gridConfig = $gridField->getConfig();
+            $multiClasses = $this->getManagedAddNewMultiClasses($this->modelClass);
+            $showAdd = empty($multiClasses);
 
-            $detailForm = $gridConfig->getComponentByType(GridFieldDetailForm::class);
-            if ($detailForm !== null) {
-                $detailForm->setItemRequestClass(
-                    ListedPageGridFieldItemRequest::class
-                );
+            $gridConfig = GridFieldConfig_ListedPages::create(
+                null, 20, true, $showAdd, null, true
+            );
+            if (!empty($multiClasses)) {
+                $gridConfig->addMultiAdder($multiClasses);
             }
+
+            $gridField->setConfig($gridConfig);
         }
 
         $this->extend('updateEditFormForSiteTrees', $form);
@@ -341,6 +346,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
             $filter['ClassName:ExactMatch'] = array_values($classes);
         }
 
+        /** @var \Page $class */
         $list = $class::get()->filter($filter);
         $this->extend('updateListForIndexListedPages', $list);
         return $list;
@@ -356,15 +362,49 @@ abstract class ListedPagesAdmin extends ModelAdmin
     protected function getListForSiteTrees()
     {
         $list = parent::getList();
+        $multiClasses = $this->getManagedAddNewMultiClasses($this->modelClass);
+        if (!empty($multiClasses))
+        {
+            $classesFilter = [];
+            foreach ($multiClasses as $key => $value)
+            {
+                $class = is_int($key) ? $value : $key;
+                $subclasses = array_values(ClassInfo::subclassesFor($class));
+                $classesFilter = [...$classesFilter, ...$subclasses];
+            }
+            $list = $list->filter('ClassName', $classesFilter);
+        }
+        $sort = $this->getManagedModelSort($this->modelClass);
+        if (!is_null($sort)) {
+            $list = $list->sort($sort);
+        }
         $this->extend('updateListForSiteTrees', $list);
         return $list;
     }
 
 
+    protected function getManagedAddNewMultiClasses(string $modelClass): ?array
+    {
+        $multiClasses = static::config()->get('managed_add_new_multi');
+        if (empty($multiClasses)) return null;
+        $modelMultiClasses = $multiClasses[$modelClass] ?? null;
+        if (empty($modelMultiClasses)) return null;
+        return $modelMultiClasses;
+    }
+
+    protected function getManagedModelSort(string $modelClass): ?string
+    {
+        $sorts = static::config()->get('managed_model_sort');
+        if (empty($sorts)) return null;
+        $modelSort = $sorts[$modelClass] ?? null;
+        if (empty($modelSort)) return null;
+        return $modelSort;
+    }
+
 
     /**
      * Return null for export/import/search -related functions
-     * if the managed $model is extended by ListingsRootPageExtension
+     * if the managed $model is extended by ListingsRootExtension
      */
 
     public function getExportFields()
@@ -374,7 +414,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         }
 
         $model = singleton($this->modelClass);
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
             return null;
         }
         return parent::getExportFields();
@@ -387,7 +427,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         }
 
         $model = singleton($this->modelClass);
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
             return null;
         }
         return parent::ImportForm();
@@ -400,7 +440,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         }
 
         $model = singleton($this->modelClass);
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
             return null;
         }
         return parent::SearchForm();
@@ -413,7 +453,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         }
 
         $model = singleton($this->modelClass);
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
             return null;
         }
         return parent::SearchSummary();
@@ -426,7 +466,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         }
 
         $model = singleton($this->modelClass);
-        if ($model->hasExtension(ListingsRootPageExtension::class)) {
+        if ($model->hasExtension(ListingsRootExtension::class)) {
             return null;
         }
         return parent::getSearchContext();

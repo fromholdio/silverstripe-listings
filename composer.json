@@ -16,6 +16,7 @@
         "silverstripe/framework": "^5",
 		"silverstripe/vendor-plugin": "^2",
         "fromholdio/silverstripe-commonancestor": "^1",
+        "fromholdio/silverstripe-gridfield-extradata": "^1.1.0",
         "symbiote/silverstripe-gridfieldextensions": "^4"
     },
 	"autoload": {

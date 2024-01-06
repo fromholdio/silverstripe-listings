@@ -4,7 +4,6 @@ namespace Fromholdio\Listings\Forms;
 
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TabSet;
-use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 
 class ListedPageGridFieldItemRequest extends VersionedGridFieldItemRequest

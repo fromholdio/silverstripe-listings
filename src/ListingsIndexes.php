@@ -3,7 +3,7 @@
 namespace Fromholdio\Listings;
 
 use Fromholdio\CommonAncestor\CommonAncestor;
-use Fromholdio\Listings\Extensions\ListedPageExtension;
+use Fromholdio\Listings\Extensions\ListingsIndexExtension;
 use Psr\SimpleCache\CacheInterface;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
@@ -13,13 +13,30 @@ use SilverStripe\Core\Flushable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 
-class ListedPages implements Flushable
+class ListingsIndexes implements Flushable
 {
     use Injectable;
     use Extensible;
     use Configurable;
+
+    /**
+     * Use tokens rather than IDs for in-situ routing
+     * and non-in-situ referring index linking.
+     * --
+     * Requires Token field value to be set on
+     * ListingsIndexes and ListedPages.
+     * @see Tokenator
+     * @var bool
+     */
+    private static $is_tokens_enabled = true;
+
+    private static $index_extension_class = ListingsIndexExtension::class;
+
+    public static function is_tokens_enabled(): bool
+    {
+        return self::config()->get('is_tokens_enabled');
+    }
 
     public static function get_classes(bool $includeSubclasses = true): array
     {
@@ -38,105 +55,71 @@ class ListedPages implements Flushable
         return $classes;
     }
 
-    public static function get_classes_dropdown_source(
-        bool $includeSubclasses = true,
-        bool $useSingular = false
-    ): array
+    public static function get_classes_for_page(string $pageClass): array
     {
-        $classes = static::get_classes($includeSubclasses);
-        foreach ($classes as $class) {
-            if ($useSingular) {
-                $title = $class::singleton()->i18n_singular_name();
-            }
-            else {
-                $title = $class::singleton()->i18n_plural_name();
-            }
-            $classes[$class] = $title;
-        }
-        return $classes;
-    }
-
-    public static function get_index_classes(): array
-    {
-        $classes = static::get_classes();
-        foreach ($classes as $class) {
-            if (!$class::singleton()->config()->get('can_be_root')) {
-                unset($classes[$class]);
+        ListedPages::validate_class($pageClass);
+        $pageClassAncestors = ClassInfo::ancestry($pageClass);
+        $allIndexClasses = static::get_classes(true);
+        $indexClasses = [];
+        foreach ($allIndexClasses as $indexClass)
+        {
+            /** @var ListingsIndexExtension&SiteTree $indexClass */
+            $indexListedPageClasses = $indexClass::singleton()->getListedPagesClasses();
+            foreach ($indexListedPageClasses as $indexListedPageClass)
+            {
+                if (in_array($indexListedPageClass, $pageClassAncestors))
+                {
+                    /** @var string $indexClass */
+                    $indexClasses[$indexClass] = $indexClass;
+                    break;
+                }
             }
         }
-        return $classes;
+        return $indexClasses;
     }
 
-    public static function get(
-        ?array $classes = null,
-        $parentIDs = null,
-        $includeSubclasses = true
-    ): DataList
+    public static function get(?array $classes = null, bool $includeSubclasses = true): DataList
     {
         if (empty($classes)) {
             $classes = static::get_classes($includeSubclasses);
         }
-        elseif ($includeSubclasses) {
+        $commonClass = static::get_common_class($classes);
+        if ($includeSubclasses) {
             $classes = static::add_subclasses($classes);
         }
-
-        $commonClass = static::get_common_class($classes);
-
         $filter = ['ClassName:ExactMatch' => $classes];
-        if (!empty($parentIDs)) {
-            if (!is_array($parentIDs)) {
-                $parentIDs = [$parentIDs];
-            }
-            $filter['ParentID'] = $parentIDs;
-        }
-
-        /** @var DataObject $commonClass */
-        return $commonClass::get()->filter($filter);
+        /** @var SiteTree $commonClass */
+        /** @var DataList $indexes */
+        $indexes = $commonClass::get()->filter($filter);
+        return $indexes;
     }
 
-    public static function filter(DataList $pages, $filter): DataList
+    public static function get_common_class(array $classes): string
     {
-        if ($pages->count() === 0) {
-            return $pages;
-        }
-
-        $pageIDs = $pages->columnUnique('ID');
-        $pageClass = $pages->dataClass();
-        if (!empty($filter['ID']))
-        {
-            $filterIDs = $filter['ID'];
-            if (!is_array($filterIDs)) {
-                $filterIDs = [$filterIDs];
-            }
-            $ids = array_intersect($pageIDs, $filterIDs);
-            $filter['ID'] = count($ids) > 0 ? $ids : ['-1'];
-        }
-
-        /** @var DataObject $pageClass */
-        return $pageClass::get()->filter($filter);
-    }
-
-    public static function filter_by_ids(DataList $pages, array $ids): DataList
-    {
-        return static::filter($pages, ['ID' => $ids]);
-    }
-
-    public static function get_common_class(?array $classes = null): string
-    {
-        if (!empty($classes)) {
-            static::validate_classes($classes);
-        }
-        else {
-            $classes = static::get_classes(false);
-        }
+        static::validate_classes($classes);
 
         // If only one class is configured, return it immediately.
         if (count($classes) === 1) {
-            return reset($classes);
+            $classes = array_values($classes);
+            return $classes[0];
         }
 
         // Else return closest common ancestor class name.
         return CommonAncestor::get_closest($classes);
+    }
+
+    public static function get_common_singular_name(array $classes): string
+    {
+        /** @var SiteTree&ListingsIndexExtension $class */
+        $class = static::get_common_class($classes);
+        return $class::singleton()->i18n_singular_name();
+    }
+
+    public static function get_common_plural_name(array $classes): string
+    {
+        /** @var SiteTree&ListingsIndexExtension $class */
+        $class = static::get_common_class($classes);
+        return $class::singleton()->i18n_plural_name();
     }
 
     protected static function add_subclasses(array $classes): array
@@ -166,16 +149,9 @@ class ListedPages implements Flushable
 
     public static function validate_classes(array $classes): bool
     {
-        if (!is_array($classes)) {
-            throw new \InvalidArgumentException(
-                'Classes must be passed as an array to ListedPages::validate_classes(). '
-                . gettype($classes) . ' was supplied instead.'
-            );
-        }
-
         if (empty($classes)) {
             throw new \InvalidArgumentException(
-                'ListedPages::validate_classes() must be passed '
+                static::class . '::validate_classes() must be passed '
                 . 'at least one page class in $classes array. Array was empty.'
             );
         }
@@ -183,10 +159,12 @@ class ListedPages implements Flushable
         // To confirm we're working with a non-associative array of class names as expected.
         $classes = array_values($classes);
 
+        $indexClass = static::config()->get('index_extension_class');
+
         // Ensure all supplied classes are valid
         foreach ($classes as $class) {
 
-            $invalidMessage = 'Invalid class passed to ListedPages::validate_classes(): ';
+            $invalidMessage = 'Invalid class passed to ' . static::class . '::validate_classes(): ';
 
             // Check exists
             if (!ClassInfo::exists($class)) {
@@ -195,15 +173,15 @@ class ListedPages implements Flushable
                 );
             }
 
-            // Check is extended by ListedPageExtension
-            if (!singleton($class)->has_extension(ListedPageExtension::class)) {
+            // Check is extended
+            if (!$class::singleton()->hasExtension($indexClass)) {
                 throw new \UnexpectedValueException(
-                    $invalidMessage . ' ' . $class . ' is not extended by ListedPageExtension.'
+                    $invalidMessage . ' ' . $class . ' is not extended by ' . $indexClass
                 );
             }
 
             // Check is a SiteTree or descendent
-            if (!is_a(singleton($class), SiteTree::class)) {
+            if (!is_a($class, SiteTree::class, true)) {
                 throw new \UnexpectedValueException(
                     $invalidMessage . ' ' . $class . ' is not a descendent of ' . SiteTree::class . '.'
                 );
@@ -214,7 +192,6 @@ class ListedPages implements Flushable
         $self->invokeWithExtensions('validateClasses', $classes);
         return true;
     }
-
 
     /**
      * This function is triggered early in the request if the "flush" query
@@ -234,7 +211,7 @@ class ListedPages implements Flushable
         $pages = [];
         $classes = ClassInfo::subclassesFor(SiteTree::class);
         foreach ($classes as $class) {
-            if ($class::has_extension(ListedPageExtension::class)) {
+            if ($class::has_extension(static::config()->get('index_extension_class'))) {
                 static::validate_class($class);
                 $pages[$class] = $class;
             }
@@ -252,7 +229,7 @@ class ListedPages implements Flushable
 
     protected static function get_cache_key(string $suffix, ?array $classes = null): string
     {
-        $key = 'ListedPageClasses-' . $suffix;
+        $key = 'ListedIndexClasses-' . $suffix;
         if (!empty($classes)) {
             $key .= '-' . md5(implode('-', $classes));
         }

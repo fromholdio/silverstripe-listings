@@ -2,7 +2,6 @@
 
 namespace Fromholdio\Listings\Forms;
 
-use Fromholdio\Listings\Extensions\ListedPageExtension;
 use SilverStripe\CMS\Controllers\CMSPageAddController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;

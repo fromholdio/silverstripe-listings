@@ -2,8 +2,6 @@
 
 namespace SilverStripe\Listings\Forms;
 
-use Fromholdio\Listings\Forms\GridFieldListedPagesAddNewButton;
-use Fromholdio\Listings\Forms\GridFieldListedPagesEditButton;
 use Fromholdio\Listings\Forms\ListedPageGridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldButtonRow;
