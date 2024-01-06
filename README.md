@@ -12,11 +12,12 @@ This needs a whole heap more documentation, and even some example implementation
 
 Feel free to submit any questions as issues in the meantime.
 
-## Requirements
+## Requirements for 3.x (in-progress branch)
 
-* [silverstripe-framework](https://github.com/silverstripe/silverstripe-cms) ^4
+* [silverstripe-framework](https://github.com/silverstripe/silverstripe-cms) ^5.0
 * [fromholdio/silverstripe-commonancestor](https://github.com/fromholdio/silverstripe-commonancestor) ^1.0
-* [symbiote/silverstripe-gridfieldextensions](https://github.com/symbiote/silverstripe-gridfieldextensions) ^3.0
+* [fromholdio/silverstripe-gridfield-extradata](https://github.com/fromholdio/silverstripe-gridfield-extradata) ^1.1.0
+* [symbiote/silverstripe-gridfieldextensions](https://github.com/symbiote/silverstripe-gridfieldextensions) ^4.0
 
 ## Installation
 
@@ -37,5 +38,3 @@ More thorough docs to come. In the meantime please submit questions as issues.
 Add `doPlaceCMSFieldsUnderListedPagesAdminRootTabSet():bool` to your ListedPage class, and when displayed inside a ListedPagesAdmin the page fields' TabSets and Tabs will be displayed on the left side (like regularly viewed pages) rather than the top right.
 
 Further add `doAddSettingsFieldsAsListedPagesAdminTab():bool` to ListedPage class, and the page's settings fields will be displayed per regularly viewed pages as a Settings tab on the top right. This may/may not work for your specific class, where the same field name exists in your pages' getCMSFields and getSettingsFields. You'll need to manage that.
-
-
