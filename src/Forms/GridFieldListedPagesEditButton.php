@@ -5,7 +5,7 @@ namespace Fromholdio\Listings\Forms;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldEditButton;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\ArrayData;
 
 /**
  * Swaps the GridField Link out for the SiteTree edit link using {@link SiteTree::CMSEditLink()}.

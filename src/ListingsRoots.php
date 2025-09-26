@@ -6,7 +6,6 @@ use Fromholdio\CommonAncestor\CommonAncestor;
 use Fromholdio\Listings\Extensions\ListingsRootPageExtension;
 use Psr\SimpleCache\CacheInterface;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\Middleware\FlushMiddleware;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Flushable;
@@ -23,7 +22,7 @@ class ListingsRoots implements Flushable
     public static function get_classes($includeSubclasses = true)
     {
         $classes = [];
-        
+
         // retrieve classes from cache
         $cache = self::get_cache();
         $cacheKey = self::get_cache_key('Classes');
@@ -33,11 +32,11 @@ class ListingsRoots implements Flushable
         if ($cache->has($cacheKey)) {
             $classes = $cache->get($cacheKey);
         }
-        
+
         if ($includeSubclasses) {
             $classes = self::add_subclasses($classes);
         }
-        
+
         return $classes;
     }
 
@@ -130,27 +129,27 @@ class ListingsRoots implements Flushable
     protected static function add_subclasses($classes)
     {
         $cache = self::get_cache();
-        
+
         // retrieve classes from cache
         $cacheKey = self::get_cache_key('IncludeSubclasses', $classes);
         if ($cache->has($cacheKey)) {
-            
+
             $classes = $cache->get($cacheKey);
-            
+
         } else {
-            
+
             $classes = array_combine($classes, $classes);
-            
+
             foreach ($classes as $class) {
                 $subclasses = ClassInfo::subclassesFor($class);
                 foreach ($subclasses as $subclass) {
                     $classes[$subclass] = $subclass;
                 }
             }
-            
+
             $cache->set($cacheKey, $classes);
         }
-        
+
         return $classes;
     }
 
@@ -217,15 +216,13 @@ class ListingsRoots implements Flushable
      * This function is triggered early in the request if the "flush" query
      * parameter has been set. Each class that implements Flushable implements
      * this function which looks after it's own specific flushing functionality.
-     *
-     * @see FlushMiddleware
      */
     public static function flush()
     {
         self::get_cache()->clear();
         self::build_cache();
     }
-    
+
     private static function build_cache() {
         // build pages cache
         $pages = [];
@@ -241,11 +238,11 @@ class ListingsRoots implements Flushable
         $cache->set($cacheKey, $pages);
         self::add_subclasses($pages);
     }
-    
+
     private static function get_cache() {
         return Injector::inst()->get(CacheInterface::class . '.ListingsCache');
     }
-    
+
     private static function get_cache_key($suffix, $classes=null) {
         return 'ListingsRootClasses-'.$suffix.($classes ? md5(implode('-', $classes)) : '');
     }

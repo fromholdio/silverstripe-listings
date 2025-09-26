@@ -5,13 +5,13 @@ namespace Fromholdio\Listings\Extensions;
 use Fromholdio\Listings\ListedPages;
 use Fromholdio\Listings\ListingsRoots;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\CMS\Model\SiteTreeExtension;
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\View\SSViewer;
 
-class ListedPageExtension extends SiteTreeExtension
+class ListedPageExtension extends Extension
 {
     public function updateCMSFields(FieldList $fields)
     {

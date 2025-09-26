@@ -3,9 +3,9 @@
 namespace Fromholdio\Listings\Extensions;
 
 use Fromholdio\Listings\ListedPages;
-use SilverStripe\CMS\Model\SiteTreeExtension;
+use SilverStripe\Core\Extension;
 
-class ListingsSiteTreeExtension extends SiteTreeExtension
+class ListingsSiteTreeExtension extends Extension
 {
     /**
      * You must supply an array of at least one SiteTree class extended
