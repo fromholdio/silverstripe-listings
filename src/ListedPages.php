@@ -67,7 +67,7 @@ class ListedPages implements Flushable
         return $classes;
     }
 
-    public static function get(array $classes = null, $parentIDs = null, $includeSubclasses = true)
+    public static function get(?array $classes = null, $parentIDs = null, $includeSubclasses = true)
     {
         if (is_null($classes) || empty($classes)) {
             $classes = self::get_classes($includeSubclasses);
