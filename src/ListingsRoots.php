@@ -5,7 +5,7 @@ namespace Fromholdio\Listings;
 use Fromholdio\Listings\Extensions\ListingsRootExtension;
 use SilverStripe\Core\Flushable;
 
-class ListingsRoots extends ListingsIndexes implements Flushable
+class ListingsRoots extends ListingsIndexes #implements Flushable
 {
     private static $index_extension_class = ListingsRootExtension::class;
 

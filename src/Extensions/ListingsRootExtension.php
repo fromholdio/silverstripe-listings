@@ -14,7 +14,7 @@ use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\HeaderField;
 use Page;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Versioned\VersionedGridFieldState\VersionedGridFieldState;
 
 class ListingsRootExtension extends ListingsIndexExtension

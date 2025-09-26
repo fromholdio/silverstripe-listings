@@ -220,8 +220,6 @@ class ListedPages implements Flushable
      * This function is triggered early in the request if the "flush" query
      * parameter has been set. Each class that implements Flushable implements
      * this function which looks after its own specific flushing functionality.
-     *
-     * @see FlushMiddleware
      */
     public static function flush(): void
     {

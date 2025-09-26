@@ -6,13 +6,13 @@ use Fromholdio\Helpers\ORM\ListHelper;
 use Fromholdio\Listings\ListedPages;
 use Fromholdio\Listings\ListingsIndexes;
 use Fromholdio\Listings\ListingsRoots;
-use SilverStripe\CMS\Model\SiteTreeExtension;
 use SilverStripe\Control\Controller;
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
 use Page;
 use SilverStripe\ORM\DataList;
 
-class ListedPageExtension extends SiteTreeExtension
+class ListedPageExtension extends Extension
 {
     private static $is_extra_roots_enabled = true;
     private static $is_insitu_enabled = true;

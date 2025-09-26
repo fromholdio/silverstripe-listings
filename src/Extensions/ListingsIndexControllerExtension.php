@@ -9,7 +9,7 @@ use SilverStripe\Core\Extension;
 use Page;
 use PageController;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\Model\List\SS_List;
 
 class ListingsIndexControllerExtension extends Extension
 {

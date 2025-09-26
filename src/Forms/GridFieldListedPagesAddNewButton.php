@@ -2,7 +2,7 @@
 
 namespace Fromholdio\Listings\Forms;
 
-use SilverStripe\CMS\Controllers\CMSPageAddController;
+use SilverStripe\CMS\Forms\CMSMainAddForm;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
@@ -14,8 +14,8 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\View\Requirements;
 
 /**
@@ -34,14 +34,11 @@ class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements 
 
     /**
      * Determine the list of classnames and titles allowed for a given parent object
-     *
-     * @param SiteTree $parent
-     * @return boolean
      */
-    public function getAllowedChildren(SiteTree $parent = null)
+    public function getAllowedChildren(?SiteTree $parent = null)
     {
         if (!$parent || !$parent->canAddChildren()) {
-            return array();
+            return [];
         }
 
         $children = [];
@@ -130,7 +127,7 @@ class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements 
     }
 
     /**
-     * Handles the add action, but only acts as a wrapper for {@link CMSPageAddController::doAdd()}
+     * Handles the add action, but only acts as a wrapper for {@link CMSMainAddForm::doAdd()}
      *
      * @param GridField $gridField
      * @param string $actionName
@@ -151,8 +148,8 @@ class GridFieldListedPagesAddNewButton extends GridFieldAddNewButton implements 
                 'PageType' => $tmpData['pageType']
             );
 
-            /** @var $controller CMSPageAddController */
-            $controller = Injector::inst()->create(CMSPageAddController::class);
+            /** @var $controller CMSMainAddForm */
+            $controller = Injector::inst()->create(CMSMainAddForm::class);
 
             // pass current request to newly created controller
             $request = Controller::curr()->getRequest();

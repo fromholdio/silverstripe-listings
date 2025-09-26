@@ -4,14 +4,14 @@ namespace Fromholdio\Listings\Extensions;
 
 use Fromholdio\Helpers\ORM\ListHelper;
 use Fromholdio\Listings\ListedPages;
-use SilverStripe\CMS\Model\SiteTreeExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\ORM\DataList;
 use Page;
 
-class ListingsIndexExtension extends SiteTreeExtension
+class ListingsIndexExtension extends Extension
 {
     private static $is_insitu_enabled = true;
     private static $is_insitu_toggle_enabled = false;
