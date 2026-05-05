@@ -2,7 +2,6 @@
 
 namespace Fromholdio\Listings\Extensions;
 
-use Fromholdio\Helpers\ORM\ListHelper;
 use Fromholdio\Listings\ListedPages;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CheckboxSetField;
@@ -63,9 +62,6 @@ class ListingsIndexExtension extends Extension
      * ----------------------------------------------------
      */
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getListedPages(): DataList
     {
         $pages = ListedPages::get(

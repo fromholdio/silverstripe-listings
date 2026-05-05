@@ -2,7 +2,6 @@
 
 namespace Fromholdio\Listings\Extensions;
 
-use Fromholdio\Helpers\ORM\ListHelper;
 use Fromholdio\Listings\ListedPages;
 use Fromholdio\Listings\ListingsIndexes;
 use Fromholdio\Listings\ListingsRoots;
@@ -135,9 +134,6 @@ class ListedPageExtension extends Extension
         return $defaultRoot;
     }
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getAvailableListingsRoots(): DataList
     {
         $classes = $this->getOwner()->getAvailableListingsRootsClasses();
@@ -205,9 +201,6 @@ class ListedPageExtension extends Extension
         return (bool) $this->getOwner()->config()->get('is_extra_roots_enabled');
     }
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getExtraListingsRoots(): DataList
     {
         $roots = $this->getOwner()->getAvailableExtraListingsRoots();
@@ -217,16 +210,13 @@ class ListedPageExtension extends Extension
                 ? $this->getOwner()->provideExtraListingsRootIDs()
                 : [];
             $roots = empty($ids)
-                ? $roots->empty()
+                ? $roots->filter('ID', '-1')
                 : $roots->filter('ID', $ids);
         }
         $this->getOwner()->invokeWithExtensions('updateExtraListingsRoots', $roots);
         return $roots;
     }
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getAvailableExtraListingsRoots(): DataList
     {
         $roots = $this->getOwner()->getAvailableListingsRoots();
@@ -237,7 +227,7 @@ class ListedPageExtension extends Extension
             }
         }
         else {
-            $roots = $roots->empty();
+            $roots = $roots->filter('ID', '-1');
         }
         $this->getOwner()->invokeWithExtensions('updateAvailableExtraListingsRoots', $roots);
         return $roots;

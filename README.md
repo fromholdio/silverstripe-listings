@@ -12,12 +12,12 @@ This needs a whole heap more documentation, and even some example implementation
 
 Feel free to submit any questions as issues in the meantime.
 
-## Requirements for 3.x (in-progress branch)
+## Requirements for 3.x
 
-* [silverstripe-framework](https://github.com/silverstripe/silverstripe-cms) ^5.0
-* [fromholdio/silverstripe-commonancestor](https://github.com/fromholdio/silverstripe-commonancestor) ^1.0
-* [fromholdio/silverstripe-gridfield-extradata](https://github.com/fromholdio/silverstripe-gridfield-extradata) ^1.1.0
-* [symbiote/silverstripe-gridfieldextensions](https://github.com/symbiote/silverstripe-gridfieldextensions) ^4.0
+* [silverstripe-framework](https://github.com/silverstripe/silverstripe-framework) ^6.0
+* [fromholdio/silverstripe-commonancestor](https://github.com/fromholdio/silverstripe-commonancestor) ^1.2.0
+* [fromholdio/silverstripe-gridfield-extradata](https://github.com/fromholdio/silverstripe-gridfield-extradata) ^2.0.0
+* [symbiote/silverstripe-gridfieldextensions](https://github.com/symbiote/silverstripe-gridfieldextensions) ^5.0.3
 
 ## Installation
 

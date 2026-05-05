@@ -3,7 +3,6 @@
 namespace Fromholdio\Listings\Extensions;
 
 use Fromholdio\GridFieldExtraData\GridFieldConfig_ExtraData;
-use Fromholdio\Helpers\ORM\ListHelper;
 use Fromholdio\Listings\ListedPages;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
@@ -85,27 +84,22 @@ class ListingsRootExtension extends ListingsIndexExtension
      * ----------------------------------------------------
      */
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getListedPages(): DataList
     {
         $class = $this->getOwner()->getListedPagesCommonClass();
         $localPages = $this->getOwner()->getLocalListedPages();
         $extraPages = $this->getOwner()->getExtraListedPages();
+        $ids = [
+            ...$localPages->columnUnique('ID'),
+            ...$extraPages->columnUnique('ID')
+        ];
         $pages = $class::get()->filter([
-            'ID' => [
-                ...$localPages->filterableColumn('ID'),
-                ...$extraPages->filterableColumn('ID')
-            ]
+            'ID' => !empty($ids) ? $ids : ['-1']
         ]);
         $this->getOwner()->invokeWithExtensions('updateListedPages', $pages);
         return $pages;
     }
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getLocalListedPages(): DataList
     {
         $pages = ListedPages::get(
@@ -121,15 +115,11 @@ class ListingsRootExtension extends ListingsIndexExtension
         return [$this->getOwner()->ID];
     }
 
-    /**
-     * @return DataList&ListHelper
-     */
     public function getExtraListedPages(): DataList
     {
         $pages = ListedPages::get(
             $this->getOwner()->getListedPagesClasses()
         );
-        /** @var DataList&ListHelper $pages */
         $pages = $pages->exclude('ParentID', $this->getOwner()->getField('ID'));
         if ($pages->count() > 0)
         {
@@ -137,7 +127,7 @@ class ListingsRootExtension extends ListingsIndexExtension
                 ? $this->getOwner()->provideExtraListedPageIDs()
                 : [];
             $pages = empty($ids)
-                ? $pages->empty()
+                ? $pages->filter('ID', '-1')
                 : $pages->filter('ID', $ids);
         }
         $this->getOwner()->invokeWithExtensions('updateExtraListedPages', $pages);
