@@ -3,8 +3,8 @@
 namespace Fromholdio\Listings\Admin;
 
 use Fromholdio\CommonAncestor\CommonAncestor;
-use Fromholdio\Listings\Extensions\ListingsRootExtension;
 use Fromholdio\Listings\Extensions\ListedPageExtension;
+use Fromholdio\Listings\Extensions\ListingsRootExtension;
 use Fromholdio\Listings\Forms\ListedPageGridFieldAddNewMultiClassHandler;
 use Fromholdio\Listings\Forms\ListedPageGridFieldItemRequest;
 use Fromholdio\Listings\ListedPages;

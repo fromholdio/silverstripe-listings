@@ -16,7 +16,6 @@ use SilverStripe\Forms\GridField\GridFieldPrintButton;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Versioned\GridFieldArchiveAction;
-use SilverStripe\Versioned\VersionedGridFieldState\VersionedGridFieldState;
 
 class GridFieldConfig_ListedPagesAdmin extends GridFieldConfig
 {
@@ -35,14 +34,11 @@ class GridFieldConfig_ListedPagesAdmin extends GridFieldConfig
         $this->addComponent(new GridFieldSortableHeader());
         $this->addComponent(new GridFieldFilterHeader());
         $this->addComponent(new GridFieldDataColumns());
-        $this->addComponent(new VersionedGridFieldState());
         $this->addComponent(new GridFieldEditButton());
         $this->addComponent(new GridFieldArchiveAction());
         $this->addComponent(new ListedPageGridFieldDetailForm());
         $this->addComponent(new GridFieldPageCount('toolbar-header-right'));
         $this->addComponent($pagination = new GridFieldPaginator($itemsPerPage));
 //        $this->addComponent(new GridFieldSiteTreeState());
-
-        $pagination->setThrowExceptionOnBadDataType(true);
     }
 }

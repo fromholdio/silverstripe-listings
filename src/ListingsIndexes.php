@@ -20,24 +20,6 @@ class ListingsIndexes implements Flushable
     use Extensible;
     use Configurable;
 
-    /**
-     * Use tokens rather than IDs for in-situ routing
-     * and non-in-situ referring index linking.
-     * --
-     * Requires Token field value to be set on
-     * ListingsIndexes and ListedPages.
-     * @see Tokenator
-     * @var bool
-     */
-    private static $is_tokens_enabled = true;
-
-    private static $index_extension_class = ListingsIndexExtension::class;
-
-    public static function is_tokens_enabled(): bool
-    {
-        return self::config()->get('is_tokens_enabled');
-    }
-
     public static function get_classes(bool $includeSubclasses = true): array
     {
         $classes = [];
