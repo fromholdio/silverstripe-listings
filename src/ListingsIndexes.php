@@ -20,6 +20,8 @@ class ListingsIndexes implements Flushable
     use Extensible;
     use Configurable;
 
+    private static $index_extension_class = ListingsIndexExtension::class;
+
     public static function get_classes(bool $includeSubclasses = true): array
     {
         $classes = [];
