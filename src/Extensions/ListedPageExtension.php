@@ -6,9 +6,7 @@ use Fromholdio\Listings\ListedPages;
 use Fromholdio\Listings\ListingsIndexes;
 use Fromholdio\Listings\ListingsRoots;
 use Page;
-use Psr\Log\LoggerInterface;
 use SilverStripe\Core\Extension;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataList;
 
