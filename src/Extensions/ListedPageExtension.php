@@ -5,24 +5,13 @@ namespace Fromholdio\Listings\Extensions;
 use Fromholdio\Listings\ListedPages;
 use Fromholdio\Listings\ListingsIndexes;
 use Fromholdio\Listings\ListingsRoots;
-use SilverStripe\Control\Controller;
+use Page;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
-use Page;
 use SilverStripe\ORM\DataList;
 
 class ListedPageExtension extends Extension
 {
-    private static $is_extra_roots_enabled = true;
-    private static $is_insitu_enabled = true;
-    private static $is_insitu_toggle_enabled = false;
-
-    private static $db = [
-        'IsInSituAllowed' => 'Boolean',
-        'Token' => 'Varchar(10)'
-    ];
-
-
     /**
      * Title
      * ----------------------------------------------------
@@ -152,7 +141,7 @@ class ListedPageExtension extends Extension
     {
         $parentID = $this->getOwner()->getField('ParentID');
         if ($doOverride || empty($parentID)) {
-            $root = $this->getDefaultListingsRoot();
+            $root = $this->getOwner()->getDefaultListingsRoot();
             $parentID = is_null($root) ? 0 : $root->getField('ID');
             $this->getOwner()->setField('ParentID', $parentID);
         }
@@ -162,103 +151,6 @@ class ListedPageExtension extends Extension
     {
         $classes = ListingsIndexes::get_classes_for_page(get_class($this->getOwner()));
         return ListingsIndexes::get($classes);
-    }
-
-
-    /**
-     * Allow display within ListingsIndexes other than direct parent root
-     * ----------------------------------------------------
-     */
-
-    public function isInSituEnabled(): bool
-    {
-        return $this->getOwner()->config()->get('is_insitu_enabled');
-    }
-
-    public function isInSituToggleEnabled(): bool
-    {
-        return $this->getOwner()->isInSituEnabled()
-            && $this->getOwner()->config()->get('is_insitu_toggle_enabled');
-    }
-
-    public function isInSituAllowed(): bool
-    {
-        return $this->getOwner()->isInSituEnabled()
-            && (
-                !$this->getOwner()->isInSituToggleEnabled()
-                || $this->getOwner()->getField('IsInSituAllowed')
-            );
-    }
-
-
-    /**
-     * Allow relations with extra Roots
-     * ----------------------------------------------------
-     */
-
-    public function isExtraRootsEnabled(): bool
-    {
-        return (bool) $this->getOwner()->config()->get('is_extra_roots_enabled');
-    }
-
-    public function getExtraListingsRoots(): DataList
-    {
-        $roots = $this->getOwner()->getAvailableExtraListingsRoots();
-        if ($roots->count() > 0)
-        {
-            $ids = $this->getOwner()->hasMethod('provideExtraListingsRootIDs')
-                ? $this->getOwner()->provideExtraListingsRootIDs()
-                : [];
-            $roots = empty($ids)
-                ? $roots->filter('ID', '-1')
-                : $roots->filter('ID', $ids);
-        }
-        $this->getOwner()->invokeWithExtensions('updateExtraListingsRoots', $roots);
-        return $roots;
-    }
-
-    public function getAvailableExtraListingsRoots(): DataList
-    {
-        $roots = $this->getOwner()->getAvailableListingsRoots();
-        $root = $this->getOwner()->getListingsRoot();
-        if ($this->getOwner()->isExtraRootsEnabled()) {
-            if (!is_null($root)) {
-                $roots = $roots->exclude('ID', $root->getField('ID'));
-            }
-        }
-        else {
-            $roots = $roots->filter('ID', '-1');
-        }
-        $this->getOwner()->invokeWithExtensions('updateAvailableExtraListingsRoots', $roots);
-        return $roots;
-    }
-
-
-    /**
-     * Listings token
-     * ----------------------------------------------------
-     */
-
-    public function getListingsToken(): ?string
-    {
-        $token = $this->getOwner()->getField('Token');
-        $this->getOwner()->invokeWithExtensions('updateListingsToken', $token);
-        return $token;
-    }
-
-
-    /**
-     * Links
-     * ----------------------------------------------------
-     */
-
-    public function updateLink(&$link, $action, $base)
-    {
-        /** @var \PageController&ListingsIndexControllerExtension $curr */
-        $curr = Controller::curr();
-        if ($curr && $curr->hasExtension(ListingsIndexControllerExtension::class)) {
-            $link = $curr->amendListedPageLink($this->getOwner(), $link);
-        }
     }
 
 
@@ -288,7 +180,7 @@ class ListedPageExtension extends Extension
      * ----------------------------------------------------
      */
 
-    public function populateDefaults(): void
+    public function onAfterPopulateDefaults(): void
     {
         $this->getOwner()->doPopulateListingsRoot();
         $this->getOwner()->doPopulateTitle(true);
@@ -296,6 +188,7 @@ class ListedPageExtension extends Extension
 
     public function onBeforeWrite(): void
     {
+        $this->getOwner()->doPopulateListingsRoot();
         $this->getOwner()->doPopulateTitle();
     }
 
@@ -311,14 +204,6 @@ class ListedPageExtension extends Extension
         // and if listed_pages_root_switch_enabled
         // add dropdown with available roots.
         // TODO: actually just allow move between valid roots.
-    }
-
-    public function updateSettingsFields(FieldList $fields): void
-    {
-        $availableRoots = $this->getAvailableListingsRoots();
-        if ($availableRoots->count() > 1) {
-            $fields->removeByName('ParentTypeParentID');
-        }
     }
 
 

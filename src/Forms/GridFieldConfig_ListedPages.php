@@ -15,7 +15,6 @@ use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\GridField\GridFieldPrintButton;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Versioned\GridFieldArchiveAction;
-use SilverStripe\Versioned\VersionedGridFieldState\VersionedGridFieldState;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 use Symbiote\GridFieldExtensions\GridFieldTitleHeader;
 
@@ -59,15 +58,11 @@ class GridFieldConfig_ListedPages extends GridFieldConfig_ExtraData
         );
         $detailForm->setItemRequestClass(ListedPageGridFieldItemRequest::class);
         $this->addComponent($detailForm);
-        $this->addComponent(new VersionedGridFieldState());
         $this->addComponent(new GridFieldArchiveAction());
         $this->addComponent(new GridField_ActionMenu());
 //        $this->addComponent(GridFieldToolbarHeader::create());
         $this->addComponent($sort = GridFieldSortableHeader::create());
         $this->addComponent($filter = GridFieldFilterHeader::create());
-
-        $sort->setThrowExceptionOnBadDataType(false);
-        $filter->setThrowExceptionOnBadDataType(false);
     }
 
     public function addMultiAdder(array $classes): GridFieldConfig_ExtraData
