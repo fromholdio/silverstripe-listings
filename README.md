@@ -12,7 +12,7 @@ This needs a whole heap more documentation, and even some example implementation
 
 Feel free to submit any questions as issues in the meantime.
 
-## Requirements for 3.x
+## Requirements for 4.x
 
 * [silverstripe-framework](https://github.com/silverstripe/silverstripe-framework) ^6.0
 * [fromholdio/silverstripe-commonancestor](https://github.com/fromholdio/silverstripe-commonancestor) ^1.2.0
