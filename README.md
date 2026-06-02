@@ -2,6 +2,8 @@
 
 A SilverStripe module providing foundation for pages with listed records.
 
+**This 3.x branch is defunct. It contains "in-situ" features that have been abandoned, for the timebeing at least. Please upgrade to the 4.x line.**
+
 * All applied via extensions, so you can maintain your own Page class data structures
 * Ability for listed pages (blog posts, for example) to be listed on site root and/or underneath Root pages (blog, for example)
 * Index pages - akin to blog root page, but is more independent, it doesn't actually house listed pages/posts underneath it
