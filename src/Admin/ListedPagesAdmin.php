@@ -38,6 +38,7 @@ abstract class ListedPagesAdmin extends ModelAdmin
         parent::init();
         Requirements::javascript('silverstripe/cms: client/dist/js/bundle.js');
         Requirements::css('silverstripe/cms: client/dist/styles/bundle.css');
+		Requirements::add_i18n_javascript('silverstripe/cms: client/lang', false);
     }
 
     public function getManagedModels()
